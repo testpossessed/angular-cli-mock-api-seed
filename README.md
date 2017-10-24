@@ -8,7 +8,7 @@ In the above mentioned team we had people responsible for UX who need to run the
 
 First clone this repo to a folder on your local storage.
 
-With a terminal or command console open execute
+With a terminal or command console open and CDd to the local folder, execute
 
 ```
 npm start
