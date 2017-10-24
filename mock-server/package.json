@@ -1,0 +1,16 @@
+{
+  "name": "mock-server",
+  "version": "1.0.0",
+  "description": "Mock API server to enable teams to work on the Angular project without concern for authentication or access to real API services and data",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "prestart": "npm install"
+  },
+  "author": "Mike Hanson",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^0.10.0"
+  }
+}
