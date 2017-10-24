@@ -14,7 +14,7 @@ With a terminal or command console open and CDd to the local folder, execute
 npm start
 ```
 
-You will see *npm install* run twice, then you a mock API server will run followed by the angular application.
+You will see *npm install* run twice, then a mock API server will start followed by the angular application.
 
 Fire up a browser and point it to http://localhost:4200.  You should see the angular application running happily.
 
@@ -42,7 +42,7 @@ Change the url in the browser address bar to http://localhost:4200/api/v1/user/1
 If you got this far then you are all setup to develop your angular application and provide mock data through JSON files.
 
 ## Deeper dive
-So the solution I came up with was to have a mock api server running along side the angular app serving static JSON files from the file system that correspond to the API urls that the application will be using.  Additionally the angular application is configured to proxy all API requests to the mock server.  So all developers have to do is mimic the RESTful API urls as folders and add an index.json file to each folder.  The mock server will serve these files up in response to request.  Lets take a closer look start from the command that gets it all running.
+So the solution I came up with was to have a mock api server running along side the angular app serving static JSON files from the file system that correspond to the API urls the application will be addressing.  Additionally the angular application is configured to proxy all API requests to the mock server.  So all developers have to do is mimic the RESTful API urls as folders and add {http-method}.json files to each folder.  The mock server will serve these files up in response to requests.  Lets take a closer look starting with the command that gets it all running.
 
 In *package.json* at the root of the repo you will find the following in the *scripts* section
 
@@ -53,9 +53,9 @@ In *package.json* at the root of the repo you will find the following in the *sc
     "prestart": "npm install"
 ```
 
-The *client* script runs the angular app using the webpack dev server using the angular-cli *serve* command.  Notice the parameter passed to the command this tells the webpack dev server to use *progy.config.json* to configure proxying of some requests.  We will look at this shortly.
+The *client* script runs the angular app in the webpack dev server using the angular-cli *serve* command.  Notice the parameter passed to the command, this tells the webpack dev server to use *proxy.config.json* to configure proxying of some requests.  We will look at this shortly.
 
-The *server* script changes to the *mock-server* folder in the repo and run *npm start*.  This folder contains another package that contains the mock API server.  We will look at this shortly.
+The *server* script changes to the *mock-server* folder in the repo and runs *npm start*.  This folder contains another package for the mock API server.  We will look at this shortly.
 
 The *start* script has been modified from the default angular-cli generated script to run the two above mentioned scripts concurrently.
 
@@ -73,7 +73,7 @@ The contents of *proxy.config.json* looks like this:
 }
 ```
 
-It tells the webpack dev server to proxy all requests for a url starting with */api* to the mock API server running on port 3000.  So our earlier requests for http://localhost:4000/api/v1/user were proxied to http://localhost:3000/api/v1/user and the response returned as if it were local to server hosting the angular app.
+It tells the webpack dev server to proxy all requests for a url starting with */api* to the mock API server running on port 3000.  So our earlier requests for http://localhost:4000/api/v1/user were proxied to http://localhost:3000/api/v1/user and the response returned as if it were local to server hosting the angular app. You will need to change this to match how your API services are addressed.
 
 ### Mock API server
 
@@ -84,13 +84,13 @@ So if you look in the *mock-server* folder you will notice it is another node.js
     "prestart": "npm install"
 ```
 
-Like our main package we have the *prestart* script to make sure dependencies are installed.  The *start* script tells node to run *server.js*, which sets up the mock API server to server static files.  I will leave you to investigate the contents, suffice to know that it creates an HTTP server that parses the url of each request and matches it to a file.  It treats the url as a folder and appends */{httpMethod}.json* to it, then if a file exists at this relative path it serves it up with a content type of *application/json*.
+Like our main package we have the *prestart* script to make sure dependencies are installed.  The *start* script tells node to run *server.js*, which sets up the mock API server to server static files.  I will leave you to investigate the contents, suffice to know it creates an HTTP server that parses the url of each request and matches it to a file.  It treats the url as a folder and appends */{httpMethod}.json* to it, then if a file exists at this relative path it serves it up with a content type of *application/json*.
 
 ### Providing mock data
 
 So how do developers provide mock data from API services you ask.  Simple I say.
 
-All you have to do is create a file called *{method}.json* in a folder that matches the url that will be requested by the angular app, where *{method}* is the HTTP method you want a response for (get, post, put etc).  Take a look inside the *mock-server* folder, you will find the following:
+All you have to do is create a file called *{http-method}.json* in a folder that matches the url that will be requested by the angular app, where *{http-method}* is the HTTP method you want a response for (get, post, put etc).  Take a look inside the *mock-server* folder, you will find the following:
 
 ```
     api
@@ -105,7 +105,11 @@ When a get for the url */api/v1/user* is requested the file /api/v1/user/get.jso
 When a get for the url */api/v1/user/1* is requested the file /api/v1/user/1/get.json will be served
 When a post to the url */api/v1/user* is requested the file /api/v1/user/post.json will be served
 
-It may not cover every scenario but it worked well for me and my team and I think will work well to allow UX members of a team to do their thing without dependencies or authentication getting in the way.
+You can modify the folder structure to match how your API services are addressed
+
+In our scenario we had a single ASP.NET project but did not use any of the MVC features other than to serve the static files for our angular app.  All of our api urls were then root relative to the application.
+
+This seed may not cover every scenario but it worked well for us and the above scenario and I think will work well to allow UX members of most teams to do their thing without dependencies or authentication getting in the way.
 
 Feel free to raise issues or pull requests to help improve this seed.  I will try to keep it up to date with the latest angular-cli and angular builds as it progresses.
 

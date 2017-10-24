@@ -8,7 +8,7 @@
     "prestart": "npm install"
   },
   "author": "Mike Hanson",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {},
   "devDependencies": {
     "http-server": "^0.10.0"
